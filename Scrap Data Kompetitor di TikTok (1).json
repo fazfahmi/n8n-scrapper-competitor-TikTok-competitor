@@ -1,0 +1,975 @@
+{
+  "name": "Scrap Data Kompetitor di TikTok",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        176
+      ],
+      "id": "0a3fad8c-cecb-4541-a22d-0fd78a6c11ee",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/OtzYfK1ndEGdwWFKQ/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"excludePinnedPosts\": true,\n  \"newestPostDate\": \"{{ $('Code').item.json.until }}\",\n  \"oldestPostDateUnified\": \"{{ $('Code').item.json.since }}\",\n  \"profileScrapeSections\": [\n    \"videos\"\n  ],\n  \"profiles\": [\n    \"{{ $json.Nama }}\"\n  ],\n  \"resultsPerPage\": 20,\n  \"searchSection\": \"/video\",\n  \"shouldDownloadCovers\": true,\n  \"shouldDownloadSlideshowImages\": true,\n  \"shouldDownloadSubtitles\": true,\n  \"shouldDownloadVideos\": true,\n  \"videoKvStoreIdOrName\": \"tes\",\n  \"profileSorting\": \"latest\",\n  \"maxProfilesPerQuery\": 10\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        -48
+      ],
+      "id": "6edec446-6226-4b06-8bcb-0b9dcfbc4ed5",
+      "name": "HTTP Request",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wlChJTQg9NnZJwRC",
+          "name": "Apify 26 Agustus"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        -48
+      ],
+      "id": "052d5f7f-91e2-4b04-99d6-1e1c6df83c8b",
+      "name": "Wait",
+      "webhookId": "e79ab027-411d-4edd-bbf9-002c68b5cd15"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.videoMeta.downloadAddr }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        -48
+      ],
+      "id": "09631733-6982-4cde-b51b-43c0a4081cf0",
+      "name": "HTTP Request1",
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\nconst since = new Date(now);\nconst until = new Date(now);\n\nsince.setDate(now.getDate() - 1);\nuntil.setDate(now.getDate() - 1);\n\nfunction formatDate(d) {\n  return d.toISOString().split('T')[0];\n}\n\nreturn [\n  {\n    json: {\n      since: formatDate(since),\n      until: formatDate(until)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -48
+      ],
+      "id": "ab4cbac6-9da7-4654-a72b-742805f70792",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Anda adalah agen AI yang bertugas menganalisis video-video TikTok kompetitor. Analisis ini bertujuan untuk memahami strategi konten mereka secara mendalam dan menyajikan hasilnya dalam format yang terstruktur dan seragam.\n\nUntuk setiap video yang diberikan, lakukan analisis berdasarkan poin-poin berikut:\n\nKategori Konten Utama\nTentukan kategori utama video. Pilih salah satu dari:\n\nEdukasi: Memberikan informasi, tips, atau tutorial.\n\nPromosi: Mempromosikan produk, layanan, atau merek.\n\nUGC (User-Generated Content): Ulasan atau testimoni pengguna.\n\nHiburan: Komedi, drama, atau konten viral.\n\nLainnya: Jika tidak ada kategori yang cocok.\n\nStrategi Konten\nJenis Konten: Jelaskan formatnya (misalnya, tutorial, storytelling, challenge, review).\n\nGaya dan Nada: Deskripsikan gaya penyampaiannya (santai, formal, lucu, inspiratif).\n\nHook Pembuka: Identifikasi elemen yang menarik perhatian penonton dalam 3 detik pertama.\n\nAnalisis Visual & Audio\nKualitas: Nilai kualitas visual (pencahayaan, resolusi) dan audio (kejelasan suara).\n\nElemen Audio: Sebutkan musik atau efek suara yang digunakan dan bagaimana pengaruhnya terhadap suasana video.\n\nTeks Overlay: Uraikan cara penggunaan teks di layar dan efektivitasnya dalam menyampaikan pesan.\n\nStrategi Engagement\nCTA (Call-to-Action): Identifikasi ajakan yang diberikan kepada penonton (contoh: like, comment, follow, link di bio).\n\nHashtag: Sebutkan hashtag yang digunakan dan relevansinya.\n\nTarget Audiens: Perkirakan audiens yang dituju berdasarkan konten dan gaya penyampaiannya.\n\nIntegrasi Produk\nCara dan Posisi: Jika ada produk, jelaskan bagaimana produk ditampilkan (misalnya, di awal, di tengah, atau sebagai fokus utama). Nilai apakah integrasinya terlihat alami atau terkesan memaksa.\n\nRingkasan dan Rekomendasi\nBerikan ringkasan temuan utama dan sertakan rekomendasi strategis untuk perbaikan konten di masa depan.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -48
+      ],
+      "id": "0c5cdc05-264d-4ea8-ba79-b70930123d4e",
+      "name": "Analyze video",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9Mu5CrCOX5swHe8J",
+          "name": "Gemini API 11 Agustus"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw",
+          "mode": "list",
+          "cachedResultName": "Analisis Video Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Output Video",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('HTTP Request1').item.json.id }}",
+            "Username": "={{ $('HTTP Request1').item.json.authorMeta.name }}",
+            "URL Profile": "={{ $('HTTP Request1').item.json.authorMeta.profileUrl }}",
+            "NickName": "={{ $('HTTP Request1').item.json.authorMeta.nickName }}",
+            "MusicName": "={{ $('HTTP Request1').item.json.musicMeta.musicName }}",
+            "webVideoURL": "={{ $('HTTP Request1').item.json.webVideoUrl }}",
+            "Height Video ": "={{ $('HTTP Request1').item.json.videoMeta.height }}",
+            "Width Video": "={{ $('HTTP Request1').item.json.videoMeta.width }}",
+            "DiggCount (Like)": "={{ $('HTTP Request1').item.json.diggCount }}",
+            "PlayCount": "={{ $('HTTP Request1').item.json.playCount }}",
+            "CollectCount (Bookmark)": "={{ $('HTTP Request1').item.json.collectCount }}",
+            "ShareCount": "={{ $('HTTP Request1').item.json.shareCount }}",
+            "commentCount": "={{ $('HTTP Request1').item.json.commentCount }}",
+            "Duration (Second)": "={{ $('HTTP Request1').item.json.videoMeta.duration }}",
+            "CreatedTime": "={{ $('Date & Time').item.json.formattedDate }}",
+            "Caption": "={{ $('HTTP Request1').item.json.text }}",
+            "Mention": "={{ $('HTTP Request1').item.json.detailedMentions }}",
+            "isAd": "={{ $('HTTP Request1').item.json.isAd }}",
+            "Following (Mengikuti)": "={{ $('HTTP Request1').item.json.authorMeta.following }}",
+            "Friends": "={{ $('HTTP Request1').item.json.authorMeta.friends }}",
+            "Fans (Follower)": "={{ $('HTTP Request1').item.json.authorMeta.fans }}",
+            "Heart (Suka)": "={{ $('HTTP Request1').item.json.authorMeta.heart }}",
+            "Video": "={{ $('HTTP Request1').item.json.authorMeta.video }}",
+            "Analisis": "={{ $('Analyze video').item.json.content.parts[0].text }}",
+            "TimeStamps": "={{ $('HTTP Request1').item.json.createTimeISO }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TimeStamps",
+              "displayName": "TimeStamps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CreatedTime",
+              "displayName": "CreatedTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "URL Profile",
+              "displayName": "URL Profile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NickName",
+              "displayName": "NickName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isAd",
+              "displayName": "isAd",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Following (Mengikuti)",
+              "displayName": "Following (Mengikuti)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Friends",
+              "displayName": "Friends",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fans (Follower)",
+              "displayName": "Fans (Follower)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Heart (Suka)",
+              "displayName": "Heart (Suka)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video",
+              "displayName": "Video",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caption",
+              "displayName": "Caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MusicName",
+              "displayName": "MusicName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "webVideoURL",
+              "displayName": "webVideoURL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Height Video ",
+              "displayName": "Height Video ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Width Video",
+              "displayName": "Width Video",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Duration (Second)",
+              "displayName": "Duration (Second)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DiggCount (Like)",
+              "displayName": "DiggCount (Like)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PlayCount",
+              "displayName": "PlayCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ShareCount",
+              "displayName": "ShareCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CollectCount (Bookmark)",
+              "displayName": "CollectCount (Bookmark)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "commentCount",
+              "displayName": "commentCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mention",
+              "displayName": "Mention",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Analisis",
+              "displayName": "Analisis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2016,
+        32
+      ],
+      "id": "6d15db46-c2fd-44c2-b9c9-2d4c9508f433",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gYWXAVroeyiyzRSf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw",
+          "mode": "list",
+          "cachedResultName": "Analisis Video Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1357249126,
+          "mode": "list",
+          "cachedResultName": "List Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit#gid=1357249126"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "dcad7aa8-0a20-4cca-bcef-894b4e7cb954",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gYWXAVroeyiyzRSf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        672,
+        -48
+      ],
+      "id": "dec6adf9-e312-4239-9e52-2673dfcacbd4",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -240
+      ],
+      "id": "f7189d96-3248-4e41-840a-9f7c35a635af",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/OtzYfK1ndEGdwWFKQ/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"excludePinnedPosts\": true,\n  \"newestPostDate\": \"{{ $('Code1').item.json.until }}\",\n  \"oldestPostDateUnified\": \"{{ $('Code1').item.json.since }}\",\n  \"profileScrapeSections\": [\n    \"reposts\"\n  ],\n  \"profiles\": [\n    \"{{ $('Get row(s) in sheet1').item.json.Nama }}\"\n  ],\n  \"resultsPerPage\": 50,\n  \"searchSection\": \"/video\",\n  \"shouldDownloadCovers\": true,\n  \"shouldDownloadSlideshowImages\": true,\n  \"shouldDownloadSubtitles\": true,\n  \"shouldDownloadVideos\": true,\n  \"videoKvStoreIdOrName\": \"tes\",\n  \"profileSorting\": \"latest\",\n  \"maxProfilesPerQuery\": 10\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        240
+      ],
+      "id": "5a4ce481-8bdc-4a12-952b-85b18e71c7b2",
+      "name": "HTTP Request2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wlChJTQg9NnZJwRC",
+          "name": "Apify 26 Agustus"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\nconst since = new Date(now);\nconst until = new Date(now);\n\nsince.setDate(now.getDate() - 1);\nuntil.setDate(now.getDate() - 1);\n\nfunction formatDate(d) {\n  return d.toISOString().split('T')[0];\n}\n\nreturn [\n  {\n    json: {\n      since: formatDate(since),\n      until: formatDate(until)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        320
+      ],
+      "id": "bc703a3d-2879-421c-a1e4-c66bf5c44cef",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw",
+          "mode": "list",
+          "cachedResultName": "Analisis Video Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1131371855,
+          "mode": "list",
+          "cachedResultName": "Output Repost",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit#gid=1131371855"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.authorMeta.name }}{{ $json.input }}",
+            "name": "={{ $json.authorMeta.name }}",
+            "author_following": "={{ $json.authorMeta.following }}",
+            "author_friends": "={{ $json.authorMeta.friends }}",
+            "author_fans": "={{ $json.authorMeta.fans }}",
+            "author_heart": "={{ $json.authorMeta.heart }}",
+            "author_video": "={{ $json.authorMeta.video }}",
+            "author_digg": "={{ $json.authorMeta.digg }}",
+            "KOL dari": "={{ $json.input }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "author_following",
+              "displayName": "author_following",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "author_friends",
+              "displayName": "author_friends",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "author_fans",
+              "displayName": "author_fans",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "author_heart",
+              "displayName": "author_heart",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "author_video",
+              "displayName": "author_video",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "author_digg",
+              "displayName": "author_digg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "KOL dari",
+              "displayName": "KOL dari",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1120,
+        320
+      ],
+      "id": "5d93ec57-3082-463e-837b-895f2038a0e3",
+      "name": "Append or update row in sheet1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gYWXAVroeyiyzRSf",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw",
+          "mode": "list",
+          "cachedResultName": "Analisis Video Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1357249126,
+          "mode": "list",
+          "cachedResultName": "List Kompetitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E0azgZI0JmAqww6CKCVGF-EYMInysyz9X3HR-aNkeEw/edit#gid=1357249126"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        448,
+        320
+      ],
+      "id": "aa1c4ec1-71ca-4c7f-86ec-f73235367695",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gYWXAVroeyiyzRSf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        672,
+        320
+      ],
+      "id": "4601bafc-ad46-4061-92ec-e55464a9c0aa",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.createTimeISO }}",
+        "format": "yyyy-MM-dd",
+        "options": {
+          "includeInputFields": true,
+          "timezone": true
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        -48
+      ],
+      "id": "b50b8975-fff4-4b6a-863e-0f1e4627b621",
+      "name": "Date & Time",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze video": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Analyze video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "033de397-7e1e-4eb8-8b49-eb937c80f404",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "30a542fabf9ae4909bd9aa0c6efc1fe1ebc393cf7a234191691a5d508c2a9bcb"
+  },
+  "id": "H1ouOjviwpLxza6r",
+  "tags": []
+}
