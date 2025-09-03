@@ -32,8 +32,6 @@ A simplified view of the workflow:
 <img width="1610" height="628" alt="image" src="https://github.com/user-attachments/assets/b6b07694-44f5-49d8-a294-acc3aee63e17" />
 
 
-*(Add a screenshot from the n8n editor here, e.g., `workflow-editor.png`)*  
-
 ---
 
 ## 🚀 Implementation Results
