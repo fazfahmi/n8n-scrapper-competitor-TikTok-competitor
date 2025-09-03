@@ -31,6 +31,9 @@ A simplified view of the workflow:
 
 <img width="1610" height="628" alt="image" src="https://github.com/user-attachments/assets/b6b07694-44f5-49d8-a294-acc3aee63e17" />
 
+Output: 
+
+<img width="2518" height="785" alt="image" src="https://github.com/user-attachments/assets/1061a199-8d5d-4018-9578-bddf48e6c70d" />
 
 ---
 
